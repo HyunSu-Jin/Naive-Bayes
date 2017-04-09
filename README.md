@@ -32,27 +32,28 @@ P(X|Ci) = P(x1 = X.x1 | Ci) * P(x2 = X.x2 | Ci) * ... * P(xn = X.xn | Ci)
 결과적으로 위로부터 구한값으로 P(X|Ci)*P(Ci) 최댓값을 만족하는 class label을 구해내어
 test-data,X에 대한 class lable을 예측한다.
 
-4. 문제점1 : P(xi = X.xi | Ci) == 0 인 경우
+4. 문제점,해결책 -- 1 : P(xi = X.xi | Ci) == 0 인 경우
+
 위 수식에 따르면 P(X|Ci)는 각 feature들이 가진 확률의 "곱셈"이므로 어떤 임의의 확률값이 0인 경우 나머지 확률 term이 높은 확률값을 갖더라도 최종값으로 0을 갖는 문제점이 존재한다.
 위 문제에 대한 직접적인 예시는 다음과 같다. 스팸여부를 나타내는 class lable, S : 스팸 이라 하자
 "이마트 세일 정보" 라는 이메일에 속한 단어 이마트,세일,정보에 대해서 P(xi = 이마트|S) 에 대한 확률과 P(Xi = 세일|S)는 높은 확률값을 지녔지만 training data set에서 스팸메일중 "정보"라는 단어를 가진 데이터가 없었다고 하면,
 P(Xi= 정보|S) = 0 이 되어 전체적인 P(X|Ci) = 0 이 되어버리는 잘못된 결과를 반환한다.
 
-5. 해결책1 : Smoothing
+- Smoothing
 따라서, 위 문제에 대하 해결책으로 가짜 빈도수(pseudocount),k 를 사용한다.
 위 예시를 다시 사용하면 스팸메일에 '정보' 단어를 지닌 데이터를 k개 추가하고 스팸메일에 '정보' 단어를 지니지 않은 데이터를 k개 추가함으로써 P(xi = 정보|S)의 수식을 다음과 같이 수정하는 것이다.
 P(xi = 정보|S) = (k + 스팸메일중 '정보'단어를 가진 데이터수)  / (2k + 전체 스팸메일수)
 이를통해 각 feature에 대한 확률값이 0이 되는일을 방지 할 수 있다.
 smoothing을 통한 오차값은 데이터베이스의 크기가 커질수록 점차 줄어든다.
 
-6. 문제점2 : underflow
+5. 문제점,해결책 -- 2 : underflow
 P(X|Ci)는 각 feature가 가진 확률값의 곱이므로 결과값이 0에 수렴하게 되어 컴퓨터가 0에 가까운 floating point를 잘 처리해 주지 못해 결과값이 0이 구해지는 경우가 있다. 결과적으로 underflow가 발생하게 되면 classifier가 정상적인 예측을 하지 못하게 된다.
 
-7. 해결책2 : log scale
+- log scale
 X = A * B이면
 log(X) = log(A) + log(B)이고 대소관계는 변하지 않으므로 프로그램 구현과정중 P(X|Ci)에 대한 처리를 로그 스케일로 하여 underflow 문제를 방지한다.
 
-8. 주요 소스코드
+6. 주요 소스코드
 <pre><code>
 def classify(dataSet,lables,testVec,k=0.1):
     m = dataSet.shape[0]
