@@ -1,5 +1,5 @@
-# Naive-Bayes
-classifier
+# Naive Bayes Classifier
+based on Bayes Theorem
 
 1. 배경
 Naive-Bayes는 확률이론인 Bayes Therem을기반으로 하는 분류자이다.
